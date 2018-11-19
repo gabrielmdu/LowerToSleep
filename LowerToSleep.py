@@ -34,10 +34,10 @@ def main():
     global loweringType
     global intervalToLower
 
-    totalTimeMin = int(input('Input total time in minutes: '))
+    totalTimeMin = convert_int_value('Enter total time in minutes: ')
     totalTime = totalTimeMin * 60
 
-    delayTimeMin = int(input('Input delay time in minutes: '))
+    delayTimeMin = convert_int_value('Enter delay time in minutes: ')
     delayTime = delayTimeMin * 60
 
     # time left to lower the volume
@@ -46,12 +46,12 @@ def main():
     loweringType = input(
         'Choose the lowering type ([i]nterpolated/[t]ime given): ')
 
-    if loweringType == 'i':
+    intervalToLower = {
         # the number of times the volume will have to decrease to reach zero within the time left
-        intervalToLower = timeLeft / scalarVol
-    elif loweringType == 't':
-        intervalToLower = int(
-            input('Input the interval time to lower the volume in seconds: '))
+        'i': lambda: timeLeft / scalarVol,
+        't': lambda: convert_int_value(
+            'Enter the interval time to lower the volume in seconds: ')
+    }.get(loweringType, lambda: timeLeft / scalarVol)()
 
     global deltaMain
     timeSec = 0
@@ -111,6 +111,18 @@ def render():
     timeTuple = time.gmtime(deltaMain)
 
     print(time.strftime('%H:%M:%S', timeTuple))
+
+
+def convert_int_value(msg):
+    converted_val = None
+
+    while converted_val is None:
+        try:
+            converted_val = int(input(msg))
+        except ValueError:
+            print("[ERROR] Entered an invalid integer")
+
+    return converted_val
 
 
 if __name__ == '__main__':
