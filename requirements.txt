@@ -1,2 +1,1 @@
-comtypes
 https://github.com/AndreMiras/pycaw/archive/master.zip
