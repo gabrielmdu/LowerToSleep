@@ -10,15 +10,15 @@ devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-scalarVol = int(volume.GetMasterVolumeLevelScalar() * 100)
+scalar_vol = int(volume.GetMasterVolumeLevelScalar() * 100)
 
 # time
 
-totalTime = 0
-delayTime = 0
-loweringType = ''
-intervalToLower = 0  # the time between every new lowering, determined by the lowering type
-deltaMain = 0  # time passed since the beginning of the program
+total_time = 0
+delay_time = 0
+lowering_type = ''
+interval_to_lower = 0  # the time between every new lowering, determined by the lowering type
+delta_main = 0  # time passed since the beginning of the program
 
 
 def main():
@@ -28,69 +28,69 @@ def main():
     print('* ------------ by Gabriel Schulte ------------ *')
     print('* -------------------------------------------- *')
 
-    global scalarVol
-    global totalTime
-    global delayTime
-    global loweringType
-    global intervalToLower
+    global scalar_vol
+    global total_time
+    global delay_time
+    global lowering_type
+    global interval_to_lower
 
-    totalTimeMin = convert_int_value('Enter total time in minutes: ')
-    totalTime = totalTimeMin * 60
+    total_time_min = convert_int_value('Enter total time in minutes: ')
+    total_time = total_time_min * 60
 
-    delayTimeMin = convert_int_value('Enter delay time in minutes: ')
-    delayTime = delayTimeMin * 60
+    delay_time_min = convert_int_value('Enter delay time in minutes: ')
+    delay_time = delay_time_min * 60
 
     # time left to lower the volume
-    timeLeft = totalTime - delayTime
+    time_left = total_time - delay_time
 
-    loweringType = input(
+    lowering_type = input(
         'Choose the lowering type ([i]nterpolated/[t]ime given): ')
 
-    intervalToLower = {
+    interval_to_lower = {
         # the number of times the volume will have to decrease to reach zero within the time left
-        'i': lambda: timeLeft / scalarVol,
+        'i': lambda: time_left / scalar_vol,
         't': lambda: convert_int_value(
             'Enter the interval time to lower the volume in seconds: ')
-    }.get(loweringType, lambda: timeLeft / scalarVol)()
+    }.get(lowering_type, lambda: time_left / scalar_vol)()
 
-    global deltaMain
-    timeSec = 0
-    timeInterval = 0
+    global delta_main
+    time_sec = 0
+    time_interval = 0
 
     # sets to true if the delay time is reached
-    canLower = False
+    can_lower = False
 
     # start counting the time here
-    startTime = time.clock()
+    start_time = time.clock()
 
     render()
 
     # the main loop
-    while deltaMain < totalTime:
+    while delta_main < total_time:
         # updates the total time running
-        deltaMain = time.clock() - startTime
+        delta_main = time.clock() - start_time
 
         # updates the delta for seconds counter
-        deltaSec = deltaMain - timeSec
+        deltaSec = delta_main - time_sec
 
         # if one second has passed, prints the current status
         if (deltaSec > 1):
             render()
-            timeSec = time.clock()
+            time_sec = time.clock()
 
         # lowering volume time
 
-        if canLower == False:
-            if deltaMain > delayTime:
-                canLower = True
-                timeInterval = time.clock()
+        if can_lower == False:
+            if delta_main > delay_time:
+                can_lower = True
+                time_interval = time.clock()
         else:
-            deltaInterval = deltaMain - timeInterval
+            deltaInterval = delta_main - time_interval
 
-            if deltaInterval > intervalToLower:
-                scalarVol -= 1
-                volume.SetMasterVolumeLevelScalar(scalarVol / 100, None)
-                timeInterval = time.clock()
+            if deltaInterval > interval_to_lower:
+                scalar_vol -= 1
+                volume.SetMasterVolumeLevelScalar(scalar_vol / 100, None)
+                time_interval = time.clock()
 
     render()
 
@@ -99,18 +99,18 @@ def render():
     os.system('cls')  # clear the console (Windows)
 
     # total, delay and interval times
-    print('Total time:', int(totalTime / 60), 'min')
-    print('Delay time:', int(delayTime / 60), 'min')
-    print('Interval to lower:', intervalToLower, 'seconds')
+    print('Total time:', int(total_time / 60), 'min')
+    print('Delay time:', int(delay_time / 60), 'min')
+    print('Interval to lower:', interval_to_lower, 'seconds')
 
     # volume
-    print('Current volume:', scalarVol)
+    print('Current volume:', scalar_vol)
 
     # current time
 
-    timeTuple = time.gmtime(deltaMain)
+    time_tuple = time.gmtime(delta_main)
 
-    print(time.strftime('%H:%M:%S', timeTuple))
+    print(time.strftime('%H:%M:%S', time_tuple))
 
 
 def convert_int_value(msg):
