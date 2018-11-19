@@ -128,5 +128,7 @@ def convert_int_value(msg):
 if __name__ == '__main__':
     try:
         main()
+    except KeyboardInterrupt:
+        print('--- Interrupted by the user ---')
     except Exception as e:
         print('[ERROR] ' + str(e))
